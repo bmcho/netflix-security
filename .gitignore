@@ -40,6 +40,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+.DS
 
 db/
 .idea/
