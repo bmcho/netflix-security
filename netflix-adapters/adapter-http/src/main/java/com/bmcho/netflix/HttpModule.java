@@ -1,0 +1,4 @@
+package com.bmcho.netflix;
+
+public interface HttpModule {
+}
