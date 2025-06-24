@@ -2,12 +2,13 @@ import com.linecorp.support.project.multi.recipe.configureByLabels
 
 plugins {
     id("java")
-    id("org.springframework.boot") version "3.5.0" apply false
-    id("io.spring.dependency-management") version "1.1.7" apply false
-    id("io.freefair.lombok") version "8.4" apply false
-    id("com.epages.restdocs-api-spec") version "0.19.4" apply false
-    id("com.coditory.integration-test") version "1.4.0" apply false
-    id("com.linecorp.build-recipe-plugin") version "1.1.1"
+    id("io.spring.dependency-management") version Versions.springDependencyManagementPlugin apply false
+    id("org.springframework.boot") version Versions.springBoot apply false
+    id("io.freefair.lombok") version Versions.lombokPlugin apply false
+    id("com.coditory.integration-test") version Versions.integrationTestPlugin apply false
+    id("com.epages.restdocs-api-spec") version Versions.restdocsApiSpec apply false
+    id("org.asciidoctor.jvm.convert") version Versions.asciidoctorPlugin apply false
+    id("com.linecorp.build-recipe-plugin") version Versions.lineRecipePlugin
 }
 
 allprojects {
@@ -45,9 +46,8 @@ configureByLabels("java") {
 
     the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
         imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${Versions.springBoot}")
             mavenBom("com.google.guava:guava-bom:${Versions.guava}")
-            mavenBom("com.epages:restdocs-api-spec-bom:${Versions.restdocsApiSpec}")
-            mavenBom("io.jsonwebtoken:jjwt-bom:${Versions.jwt}")
         }
 
         dependencies {
@@ -63,6 +63,10 @@ configureByLabels("java") {
             dependency("org.junit.jupiter:junit-jupiter-engine:${Versions.junit}")
             dependency("org.assertj:assertj-core:${Versions.assertjCore}")
             dependency("org.mockito:mockito-junit-jupiter:${Versions.mockitoCore}")
+
+            dependency("com.epages:restdocs-api-spec:${Versions.restdocsApiSpec}")
+            dependency("com.epages:restdocs-api-spec-mockmvc:${Versions.restdocsApiSpec}")
+            dependency("com.epages:restdocs-api-spec-restassured:${Versions.restdocsApiSpec}")
 
             dependencySet("io.jsonwebtoken:${Versions.jwt}") {
                 entry("jjwt-api")
@@ -99,7 +103,6 @@ configureByLabels("java") {
         integrationRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     }
 
-
     tasks.withType<Test> {
         useJUnitPlatform()
     }
@@ -118,22 +121,54 @@ configureByLabels("boot") {
     }
 }
 
+configureByLabels("asciidoctor") {
+    apply(plugin = "org.asciidoctor.jvm.convert")
+
+    tasks.named<org.asciidoctor.gradle.jvm.AsciidoctorTask>("asciidoctor") {
+        sourceDir(file("src/docs"))
+        outputs.dir(file("build/docs"))
+        attributes(
+            mapOf(
+                "snippets" to file("build/generated-snippets")
+            )
+        )
+    }
+}
+
+configureByLabels("restdocs") {
+    apply(plugin = "com.epages.restdocs-api-spec")
+}
+
 configureByLabels("querydsl") {
     apply(plugin = "io.spring.dependency-management")
 
     the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
         imports {
-            mavenBom("com.querydsl:querydsl-bom:${Versions.querydsl}")
+//            mavenBom("com.querydsl:querydsl-bom:${Versions.querydsl}")
         }
+
+//        dependencies {
+//            dependency("com.querydsl:querydsl-core:${Versions.querydsl}")
+//            dependency("com.querydsl:querydsl-jpa:${Versions.querydsl}")
+//            dependency("com.querydsl:querydsl-apt:${Versions.querydsl}")
+//        }
     }
 
     dependencies {
 
-        implementation("com.querydsl:querydsl-jpa:jakarta")
-        implementation("com.querydsl:querydsl-core")
+        implementation("com.querydsl:querydsl-jpa:${Versions.querydsl}:jakarta")
+        implementation("com.querydsl:querydsl-core:${Versions.querydsl}")
 
-        annotationProcessor("com.querydsl:querydsl-apt:jakarta")
+        annotationProcessor("com.querydsl:querydsl-apt:${Versions.querydsl}:jakarta")
         annotationProcessor("jakarta.persistence:jakarta.persistence-api")
         annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+    }
+}
+
+configureByLabels("library") {
+    apply(plugin = "java-library")
+
+    tasks.getByName<Jar>("jar") {
+        enabled = true
     }
 }
