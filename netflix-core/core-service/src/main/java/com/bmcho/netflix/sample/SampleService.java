@@ -10,12 +10,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SampleService implements SearchSampleUseCase {
 
-//    private final SamplePersistencePort samplePersistencePort;
+    private final SamplePersistencePort samplePersistencePort;
 
     @Override
     public SampleResponse getSample() {
-//        String sampleName = samplePersistencePort.getSampleName("1");
-//        return new SampleResponse(sampleName);
-        return null;
+        String sampleName = samplePersistencePort.getSampleName("1");
+        return new SampleResponse(sampleName);
     }
 }

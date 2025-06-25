@@ -15,7 +15,7 @@ public class PropertyCheck {
 
     @PostConstruct
     public void checkDatasourceProperties() {
-        String url = env.getProperty("spring.datasource.url");
+        String url = env.getProperty("spring.datasource.hikari.jdbc-url");
         log.info("spring datasource url : {}", url);
     }
 
