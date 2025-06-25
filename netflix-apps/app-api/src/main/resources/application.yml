@@ -1,0 +1,5 @@
+spring:
+  config:
+    import:
+      - 'classpath:adapter-http-property.yaml'
+      - 'classpath:adapter-persistence-property.yaml'
