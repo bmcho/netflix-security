@@ -1,5 +1,6 @@
-package com.bmcho.netflix.sample;
+package com.bmcho.netflix.controller.sample;
 
+import com.bmcho.netflix.sample.SearchSampleUseCase;
 import com.bmcho.netflix.sample.response.SampleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

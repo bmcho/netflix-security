@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements RegisterUserUseCase, FetchUserUserCase {
+public class UserService implements RegisterUserUseCase, FetchUserUseCase {
 
     private final InsertUserPort insertUserPort;
     private final FetchUserPort fetchUserPort;
