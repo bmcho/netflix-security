@@ -1,5 +1,5 @@
 
-package com.bmcho.netflix.audit;
+package com.bmcho.netflix.config.audit;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
