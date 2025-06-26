@@ -1,4 +1,4 @@
-package com.bmcho.netflix.audit;
+package com.bmcho.netflix.config.audit;
 
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.stereotype.Component;
