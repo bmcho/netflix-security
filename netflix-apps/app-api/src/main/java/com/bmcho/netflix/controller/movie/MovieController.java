@@ -1,5 +1,6 @@
-package com.bmcho.netflix.movie;
+package com.bmcho.netflix.controller.movie;
 
+import com.bmcho.netflix.movie.FetchMovieUseCase;
 import com.bmcho.netflix.movie.response.PageableMoviesResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

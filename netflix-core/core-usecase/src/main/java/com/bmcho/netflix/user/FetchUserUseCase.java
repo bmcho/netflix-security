@@ -2,8 +2,6 @@ package com.bmcho.netflix.user;
 
 import com.bmcho.netflix.user.command.UserResponse;
 
-import java.util.Optional;
-
-public interface FetchUserUserCase {
+public interface FetchUserUseCase {
     UserResponse findByEmail(String email);
 }
