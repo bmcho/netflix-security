@@ -3,19 +3,4 @@ spring:
     import:
       - 'classpath:adapter-http-property.yml'
       - 'classpath:adapter-persistence-property.yml'
-
-#  datasource:
-#    url: jdbc:mysql://localhost:3307/netflix?useUnicode=yes&characterEncoding=UTF-8&rewriteBatchedStatements=true
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    username: root
-#    password: 1234
-#  jpa:
-#    properties:
-#      hibernate:
-#        format_sql: true
-#    hibernate:
-#      ddl-auto: update
-#    generate-ddl: false
-#    # generate-ddl: true
-#    open-in-view: false
-#    show-sql: true
+      - 'classpath:adapter-redis-property.yml'
