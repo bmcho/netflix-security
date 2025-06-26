@@ -1,4 +1,4 @@
-package com.bmcho.netflix.respository;
+package com.bmcho.netflix.respository.sample;
 
 import com.bmcho.netflix.entity.QSampleEntity;
 import com.bmcho.netflix.entity.SampleEntity;
