@@ -13,3 +13,5 @@ include("netflix-core:core-service")
 include("netflix-core:core-usecase")
 
 include("netflix-commons")
+include("netflix-adapters:adapter-redis")
+findProject(":netflix-adapters:adapter-redis")?.name = "adapter-redis"
