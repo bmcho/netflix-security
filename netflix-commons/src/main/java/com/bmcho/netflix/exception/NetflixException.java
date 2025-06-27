@@ -3,7 +3,7 @@ package com.bmcho.netflix.exception;
 import lombok.Getter;
 
 @Getter
-public class NetflixException {
+public class NetflixException extends RuntimeException{
 
     private final ErrorCode code;
 
