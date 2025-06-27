@@ -3,7 +3,6 @@ package com.bmcho.netfilx.user;
 import lombok.Builder;
 import lombok.Getter;
 
-@Getter
 @Builder
 public record UserPortResponse(
     String userId,

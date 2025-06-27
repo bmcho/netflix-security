@@ -13,11 +13,11 @@ services:
     volumes:
       - ./db/mysql/init:/docker-entrypoint-initdb.d
 
-#  redis:
-#    container_name: netflix-redis
-#    hostname: redis
-#    image: redis:alpine
-#    ports:
-#      - 6379:6379
-#    command: redis-server
-#    restart: always
+  redis:
+    container_name: netflix-redis
+    hostname: redis
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    command: redis-server
+    restart: always

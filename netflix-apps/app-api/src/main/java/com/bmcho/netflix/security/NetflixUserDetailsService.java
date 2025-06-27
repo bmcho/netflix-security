@@ -3,6 +3,7 @@ package com.bmcho.netflix.security;
 import com.bmcho.netflix.user.FetchUserUseCase;
 import com.bmcho.netflix.user.command.UserResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,12 +25,12 @@ public class NetflixUserDetailsService implements UserDetailsService {
     public NetflixAuthUser loadUserByUsername(String email) throws UsernameNotFoundException {
         UserResponse userResponse = fetchUserUseCase.findByEmail(email);
         return new NetflixAuthUser(
-                userResponse.userId(),
-                userResponse.userName(),
-                userResponse.password(),
-                userResponse.email(),
-                userResponse.phone(),
-                List.of(new SimpleGrantedAuthority(userResponse.role()))
+            userResponse.userId(),
+            userResponse.userName(),
+            userResponse.password(),
+            userResponse.email(),
+            userResponse.phone(),
+            List.of(new SimpleGrantedAuthority(StringUtils.isBlank(userResponse.role()) ? "-" : userResponse.role()))
         );
     }
 }
