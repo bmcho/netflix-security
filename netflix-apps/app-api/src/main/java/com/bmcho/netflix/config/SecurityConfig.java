@@ -23,7 +23,6 @@ import java.util.Collections;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final NetflixUserDetailsService netflixUserDetailsService;
 
     @Bean
@@ -34,17 +33,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-            .csrf(AbstractHttpConfigurer::disable)
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .httpBasic(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable)
-            .userDetailsService(netflixUserDetailsService)
-            .authorizeHttpRequests(requests ->
-                requests.requestMatchers("/", "/register", "/api/v1/user/**", "/api/v1/auth/**").permitAll()
-                    .anyRequest()
-                    .authenticated())
-
-            .build();
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .userDetailsService(netflixUserDetailsService)
+                .authorizeHttpRequests(requests ->
+                        requests.requestMatchers("/", "/register", "/api/v1/user/**", "/api/v1/auth/**").permitAll()
+                                .anyRequest()
+                                .authenticated())
+                .oauth2Login(oauth2 -> oauth2.failureUrl("/login?error=true"))
+                .build();
     }
 
 

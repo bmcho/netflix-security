@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -29,12 +31,12 @@ public class UserController {
     @PostMapping("/user/register")
     public NetflixApiResponse<UserRegistrationResponse> userRegister(@RequestBody UserRegistrationRequest userRegistrationRequest) {
         UserRegistrationResponse userRegistrationResponse = registerUserUseCase.register(
-            UserRegistrationCommand.builder()
-                .email(userRegistrationRequest.getEmail())
-                .encryptedPassword(userRegistrationRequest.getPassword())
-                .phone(userRegistrationRequest.getPhone())
-                .username(userRegistrationRequest.getUsername())
-                .build()
+                UserRegistrationCommand.builder()
+                        .email(userRegistrationRequest.getEmail())
+                        .encryptedPassword(userRegistrationRequest.getPassword())
+                        .phone(userRegistrationRequest.getPhone())
+                        .username(userRegistrationRequest.getUsername())
+                        .build()
         );
 
         return NetflixApiResponse.ok(userRegistrationResponse);
@@ -69,4 +71,11 @@ public class UserController {
 
         return NetflixApiResponse.ok("access-token");
     }
+
+    @PostMapping("/user/callback")
+    public NetflixApiResponse<String> kakaoLoginCallback(@RequestBody Map<String, String> request) {
+        String code = request.get("code");
+        return NetflixApiResponse.ok(code);
+    }
+
 }
