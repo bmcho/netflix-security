@@ -5,4 +5,6 @@ import com.bmcho.netflix.user.response.UserRegistrationResponse;
 
 public interface RegisterUserUseCase {
     UserRegistrationResponse register(UserRegistrationCommand userRegistrationCommand);
+
+    UserRegistrationResponse registerSocialUser(String username, String provider, String providerId);
 }

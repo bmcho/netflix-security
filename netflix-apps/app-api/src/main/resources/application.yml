@@ -4,7 +4,6 @@ spring:
       - 'classpath:adapter-http-property.yml'
       - 'classpath:adapter-persistence-property.yml'
       - 'classpath:adapter-redis-property.yml'
-
   security:
     oauth2:
       client:
@@ -23,3 +22,10 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+
+jwt:
+  # openssl rand -hex 32
+  secret: 776cfd7c55dc4bd45a767db72fc005eadf7f72ca61c0a8edae1ed19cc2881236
+  expire:
+    access-token: 1
+    refresh-token: 24

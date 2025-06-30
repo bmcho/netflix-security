@@ -26,7 +26,7 @@ public class NetflixUserDetailsService implements UserDetailsService {
         UserResponse userResponse = fetchUserUseCase.findByEmail(email);
         return new NetflixAuthUser(
             userResponse.userId(),
-            userResponse.userName(),
+            userResponse.username(),
             userResponse.password(),
             userResponse.email(),
             userResponse.phone(),

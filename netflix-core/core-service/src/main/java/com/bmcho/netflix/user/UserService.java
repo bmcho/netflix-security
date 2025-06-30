@@ -1,5 +1,7 @@
 package com.bmcho.netflix.user;
 
+import com.bmcho.netfilx.kakao.KakaoTokenPort;
+import com.bmcho.netfilx.kakao.KakaoUserPort;
 import com.bmcho.netfilx.user.CreateUser;
 import com.bmcho.netfilx.user.FetchUserPort;
 import com.bmcho.netfilx.user.InsertUserPort;
@@ -19,6 +21,7 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
 
     private final InsertUserPort insertUserPort;
     private final FetchUserPort fetchUserPort;
+    private final KakaoUserPort kakaoUserPort;
 
     @Override
     public UserResponse findByEmail(String email) {
@@ -35,7 +38,28 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
             .password(userPortResponse.password())
             .phone(userPortResponse.phone())
             .role(userPortResponse.role())
-            .userName(userPortResponse.userName())
+            .username(userPortResponse.username())
+            .build();
+    }
+
+    @Override
+    public UserResponse findByProviderId(String providerId) {
+        return fetchUserPort.findByProviderId(providerId)
+            .map(user ->  UserResponse.builder()
+                .providerId(user.providerId())
+                .provider(user.provider())
+                .username(user.username())
+                .build())
+            .orElse(null);
+    }
+
+    @Override
+    public UserResponse findKakaoUser(String accessToken) {
+        UserPortResponse userFromKakao = kakaoUserPort.findUserFromKakao(accessToken);
+        return UserResponse.builder()
+            .username(userFromKakao.username())
+            .provider(userFromKakao.provider())
+            .providerId(userFromKakao.providerId())
             .build();
     }
 
@@ -61,9 +85,20 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
         );
 
         return new UserRegistrationResponse(
-            userPortResponse.userName(),
+            userPortResponse.username(),
             userPortResponse.email(),
             userPortResponse.phone()
         );
+    }
+
+    @Override
+    public UserRegistrationResponse registerSocialUser(String username, String provider, String providerId) {
+        Optional<UserPortResponse> userByProviderId = fetchUserPort.findByProviderId(providerId);
+        if (userByProviderId.isPresent()) {
+            return null;
+        }
+
+        UserPortResponse socialUser = insertUserPort.createSocialUser(username, provider, providerId);
+        return new UserRegistrationResponse(socialUser.username(), null, null);
     }
 }

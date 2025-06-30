@@ -1,12 +1,11 @@
 package com.bmcho.netfilx.user;
 
 import lombok.Builder;
-import lombok.Getter;
 
 @Builder
 public record UserPortResponse(
     String userId,
-    String userName,
+    String username,
     String password,
     String email,
     String phone,
