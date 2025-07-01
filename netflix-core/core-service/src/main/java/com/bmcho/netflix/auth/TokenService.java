@@ -1,4 +1,4 @@
-package com.bmcho.netflix.auth;
+ package com.bmcho.netflix.auth;
 
 import com.bmcho.netfilx.social.SocialPlatformPort;
 import com.bmcho.netfilx.social.SocialTokenPort;

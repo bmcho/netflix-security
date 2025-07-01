@@ -5,7 +5,7 @@ import com.bmcho.netfilx.user.CreateUser;
 import com.bmcho.netfilx.user.FetchUserPort;
 import com.bmcho.netfilx.user.InsertUserPort;
 import com.bmcho.netfilx.user.UserPortResponse;
-import com.bmcho.netflix.exception.NetflixException;
+import com.bmcho.netflix.dispatcher.SocialPlatformDispatcher;
 import com.bmcho.netflix.exception.UserException;
 import com.bmcho.netflix.user.command.UserRegistrationCommand;
 import com.bmcho.netflix.user.command.UserResponse;
@@ -13,7 +13,6 @@ import com.bmcho.netflix.user.response.UserRegistrationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,7 +21,7 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
 
     private final InsertUserPort insertUserPort;
     private final FetchUserPort fetchUserPort;
-    private final List<SocialPlatformPort> socialPlatformPorts;
+    private final SocialPlatformDispatcher socialPlatformDispatcher;
 
     @Override
     public UserResponse findByEmail(String email) {
@@ -56,10 +55,7 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
 
     @Override
     public UserResponse findUserAccessToken(String provider, String accessToken) {
-        SocialPlatformPort selectedPort = socialPlatformPorts.stream()
-            .filter(port -> port.supports(provider))
-            .findFirst()
-            .orElseThrow(NetflixException.NetflixUnsupportedSocialLoginException::new);
+        SocialPlatformPort selectedPort = socialPlatformDispatcher.getProvide(provider);
         UserPortResponse user = selectedPort.findUserByAccessToken(accessToken);
         return UserResponse.builder()
             .username(user.username())
