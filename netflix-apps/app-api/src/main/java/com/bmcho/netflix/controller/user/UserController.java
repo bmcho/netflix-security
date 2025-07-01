@@ -16,12 +16,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -38,12 +39,12 @@ public class UserController {
     @PostMapping("/user/register")
     public NetflixApiResponse<UserRegistrationResponse> userRegister(@RequestBody UserRegistrationRequest userRegistrationRequest) {
         UserRegistrationResponse userRegistrationResponse = registerUserUseCase.register(
-                UserRegistrationCommand.builder()
-                        .email(userRegistrationRequest.getEmail())
-                        .encryptedPassword(userRegistrationRequest.getPassword())
-                        .phone(userRegistrationRequest.getPhone())
-                        .username(userRegistrationRequest.getUsername())
-                        .build()
+            UserRegistrationCommand.builder()
+                .email(userRegistrationRequest.getEmail())
+                .encryptedPassword(userRegistrationRequest.getPassword())
+                .phone(userRegistrationRequest.getPhone())
+                .username(userRegistrationRequest.getUsername())
+                .build()
         );
 
         return NetflixApiResponse.ok(userRegistrationResponse);
@@ -78,6 +79,11 @@ public class UserController {
         return NetflixApiResponse.ok("access-token");
     }
 
+
+    /* TODO: 2025-07-1, 화, 15:25 bmcho12
+     *  kakao 밖에 못받음, adpater 쪽에서  소셜 로그인에 대한 provider 생성으로 관리 필요
+    */
+    // front-end 에서 리다이렉트를 받고 처리 하는 과정
     @PostMapping("/user/callback")
     public NetflixApiResponse<String> kakaoLoginCallback(@RequestBody Map<String, String> request) {
         String code = request.get("code");
@@ -99,9 +105,43 @@ public class UserController {
 
         /* TODO: 2025-07-1, 화, 11:57 bmcho12
          *  추후 비대칭키 변경
-        */
+         */
         //서버내 secret key 로 server token 생성
         String accessToken = updateTokenUseCase.updateInsertToken(kakaoUser.providerId());
+        return NetflixApiResponse.ok(accessToken);
+    }
+
+    // back-end 에서만 처리했을 시, successUri 처리
+    // 코드 검증 및 accecss token 을 받을 후 유저 정보 조회를 security filter 가 해줌
+    @GetMapping("/user/social-login/success")
+    public NetflixApiResponse<String> kakaoLoginCallbackBackend(Authentication authentication) {
+
+        OAuth2AuthenticationToken authenticationUser = (OAuth2AuthenticationToken) authentication;
+        OAuth2User user = authenticationUser.getPrincipal();
+        Map<String, Object> attributes = user.getAttributes();
+
+        @SuppressWarnings("unchecked")
+        HashMap<String, Object> properties = (HashMap<String, Object>) attributes.get("properties");
+
+        String id = attributes.get("id").toString();
+        String username = Optional.ofNullable(properties.get("nickname")).map(Object::toString).orElse("unknown");
+
+
+        UserResponse userByProviderId = fetchUserUseCase.findByProviderId(id);
+        if (userByProviderId == null) {
+            // 저장
+            registerUserUseCase.registerSocialUser(
+                username,
+                "kakao",
+                id
+            );
+        }
+//
+//        /* TODO: 2025-07-1, 화, 11:57 bmcho12
+//         *  추후 비대칭키 변경
+//         */
+//        //서버내 secret key 로 server token 생성
+        String accessToken = updateTokenUseCase.updateInsertToken(id);
         return NetflixApiResponse.ok(accessToken);
     }
 

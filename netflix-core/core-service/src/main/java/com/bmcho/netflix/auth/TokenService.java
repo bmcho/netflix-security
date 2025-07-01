@@ -102,6 +102,11 @@ public class TokenService implements FetchTokenUseCase, UpdateTokenUseCase, Crea
         return accessToken;
     }
 
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
     private String getToken(String userId, Duration expireAt) {
         Date now = new Date();
         Instant instant = now.toInstant();
@@ -114,17 +119,10 @@ public class TokenService implements FetchTokenUseCase, UpdateTokenUseCase, Crea
             .compact();
     }
 
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
     private Claims parseClaims(String accessToken) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-
             return Jwts.parser()
-                .decryptWith(key) // SecretKey 타입
+                .decryptWith(getSigningKey()) // SecretKey 타입
                 .build()
                 .parseSignedClaims(accessToken)
                 .getPayload();

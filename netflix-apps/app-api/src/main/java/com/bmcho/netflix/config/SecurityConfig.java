@@ -33,17 +33,22 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .userDetailsService(netflixUserDetailsService)
-                .authorizeHttpRequests(requests ->
-                        requests.requestMatchers("/", "/register", "/api/v1/user/**", "/api/v1/auth/**").permitAll()
-                                .anyRequest()
-                                .authenticated())
-                .oauth2Login(oauth2 -> oauth2.failureUrl("/login?error=true"))
-                .build();
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .httpBasic(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+            .userDetailsService(netflixUserDetailsService)
+            .authorizeHttpRequests(requests ->
+                requests
+                    .requestMatchers("/api/v1/user/social-login/success").authenticated()
+                    .requestMatchers("/", "/register", "/api/v1/user/**", "/api/v1/auth/**").permitAll()
+                    .anyRequest()
+                    .authenticated())
+            .oauth2Login(oauth2 -> oauth2
+                .failureUrl("/login?error=true")
+                .defaultSuccessUrl("/api/v1/user/social-login/success")
+            )
+            .build();
     }
 
 

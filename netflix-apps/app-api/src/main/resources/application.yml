@@ -1,3 +1,7 @@
+logging:
+  level:
+    org.springframework.security.oauth2: trace
+
 spring:
   config:
     import:
@@ -14,7 +18,7 @@ spring:
             client-secret: 5PinaTuPbHxZ2GuhYaGpmTYSyD5ivoec
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: "http://localhost:3000/login/oauth2/code/kakao"
+            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao" # 프론트가 없기 때문에 바로 백엔드로 디이렉팅
             scope: profile_nickname
             client-authentication-method: client_secret_post
         provider:
