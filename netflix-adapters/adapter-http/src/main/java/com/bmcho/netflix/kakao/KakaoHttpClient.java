@@ -28,12 +28,11 @@ public class KakaoHttpClient implements KakaoTokenPort, KakaoUserPort {
     @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
     private String kakaoRedirectUri;
 
-    @Value("${spring.security.oauth2.kakao.token-url}")
+    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
     private String TOKEN_URL_KAKAO;
 
-    @Value("${spring.security.oauth2.kakao.userinfo-api-url}")
+    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
     private String KAKAO_USERINFO_API_URL;
-
 
     @Override
     public String getAccessTokenByCode(String code) {
