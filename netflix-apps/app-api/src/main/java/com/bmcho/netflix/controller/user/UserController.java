@@ -3,6 +3,7 @@ package com.bmcho.netflix.controller.user;
 import com.bmcho.netflix.controller.NetflixApiResponse;
 import com.bmcho.netflix.controller.user.reqeust.UserLoginRequest;
 import com.bmcho.netflix.controller.user.reqeust.UserRegistrationRequest;
+import com.bmcho.netflix.enums.SocialPlatform;
 import com.bmcho.netflix.security.NetflixAuthUser;
 import com.bmcho.netflix.token.FetchTokenUseCase;
 import com.bmcho.netflix.token.UpdateTokenUseCase;
@@ -14,7 +15,6 @@ import com.bmcho.netflix.user.response.UserRegistrationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -89,9 +89,9 @@ public class UserController {
         String code = request.get("code");
 
         // 받은 코드를 KaKao 인증서버에 전송 및 유효성 검사 이후 토큰 리턴
-        String accessTokenFromKakao = fetchTokenUseCase.getTokenFromKakao(code);
+        String accessTokenFromKakao = fetchTokenUseCase.getTokenByCode(SocialPlatform.KAKAO.name(), code);
         // 사용자 정보 요청
-        UserResponse kakaoUser = fetchUserUseCase.findKakaoUser(accessTokenFromKakao);
+        UserResponse kakaoUser = fetchUserUseCase.findUserAccessToken(SocialPlatform.KAKAO.name(), accessTokenFromKakao);
         // 소셜 유저 확인 및 저장
         UserResponse userByProviderId = fetchUserUseCase.findByProviderId(kakaoUser.providerId());
         if (userByProviderId == null) {
@@ -114,25 +114,22 @@ public class UserController {
     // back-end 에서만 처리했을 시, successUri 처리
     // 코드 검증 및 accecss token 을 받을 후 유저 정보 조회를 security filter 가 해줌
     @GetMapping("/user/social-login/success")
-    public NetflixApiResponse<String> kakaoLoginCallbackBackend(Authentication authentication) {
+    public NetflixApiResponse<String> socialLoginCallbackBackend(Authentication authentication) {
 
         OAuth2AuthenticationToken authenticationUser = (OAuth2AuthenticationToken) authentication;
         OAuth2User user = authenticationUser.getPrincipal();
         Map<String, Object> attributes = user.getAttributes();
 
-        @SuppressWarnings("unchecked")
-        HashMap<String, Object> properties = (HashMap<String, Object>) attributes.get("properties");
-
         String id = attributes.get("id").toString();
-        String username = Optional.ofNullable(properties.get("nickname")).map(Object::toString).orElse("unknown");
-
+        String username = Optional.ofNullable(attributes.get("nickname")).map(Object::toString).orElse("unknown");
+        String provider = Optional.ofNullable(attributes.get("nickname")).map(Object::toString).orElse("unknown");
 
         UserResponse userByProviderId = fetchUserUseCase.findByProviderId(id);
         if (userByProviderId == null) {
             // 저장
             registerUserUseCase.registerSocialUser(
                 username,
-                "kakao",
+                provider,
                 id
             );
         }

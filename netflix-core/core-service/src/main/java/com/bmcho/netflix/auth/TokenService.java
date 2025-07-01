@@ -1,10 +1,12 @@
 package com.bmcho.netflix.auth;
 
-import com.bmcho.netfilx.kakao.KakaoTokenPort;
+import com.bmcho.netfilx.social.SocialPlatformPort;
+import com.bmcho.netfilx.social.SocialTokenPort;
 import com.bmcho.netfilx.token.InsertTokenPort;
 import com.bmcho.netfilx.token.SearchTokenPort;
 import com.bmcho.netfilx.token.TokenPortResponse;
 import com.bmcho.netfilx.token.UpdateTokenPort;
+import com.bmcho.netflix.exception.NetflixException;
 import com.bmcho.netflix.token.CreateTokenUseCase;
 import com.bmcho.netflix.token.FetchTokenUseCase;
 import com.bmcho.netflix.token.UpdateTokenUseCase;
@@ -22,10 +24,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +46,7 @@ public class TokenService implements FetchTokenUseCase, UpdateTokenUseCase, Crea
     private final InsertTokenPort insertTokenPort;
     private final UpdateTokenPort updateTokenPort;
     private final FetchUserUseCase fetchUserUseCase;
-    private final KakaoTokenPort kakaoTokenPort;
+    private final List<SocialPlatformPort> socialPlatformPorts;
 
     @Override
     public TokenResponse createNewToken(String userId) {
@@ -60,7 +62,7 @@ public class TokenService implements FetchTokenUseCase, UpdateTokenUseCase, Crea
 
     @Override
     public Boolean validateToken(String accessToken) {
-        SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        SecretKey key = getSigningKey();
         Jwts.parser()
             .verifyWith(key).build()
             .parseSignedClaims(accessToken);
@@ -68,8 +70,12 @@ public class TokenService implements FetchTokenUseCase, UpdateTokenUseCase, Crea
     }
 
     @Override
-    public String getTokenFromKakao(String code) {
-        return kakaoTokenPort.getAccessTokenByCode(code);
+    public String getTokenByCode(String provider, String code) {
+        SocialPlatformPort selectedPort = socialPlatformPorts.stream()
+            .filter(port -> port.supports(provider))
+            .findFirst()
+            .orElseThrow(NetflixException.NetflixUnsupportedSocialLoginException::new);
+        return selectedPort.getAccessTokenByCode(code);
     }
 
     @Override

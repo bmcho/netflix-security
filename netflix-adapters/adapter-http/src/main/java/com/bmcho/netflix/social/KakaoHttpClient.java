@@ -1,9 +1,10 @@
-package com.bmcho.netflix.kakao;
+package com.bmcho.netflix.social;
 
-import com.bmcho.netfilx.kakao.KakaoTokenPort;
-import com.bmcho.netfilx.kakao.KakaoUserPort;
+import com.bmcho.netfilx.social.SocialPlatformPort;
 import com.bmcho.netfilx.user.UserPortResponse;
+import com.bmcho.netflix.enums.SocialPlatform;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class KakaoHttpClient implements KakaoTokenPort, KakaoUserPort {
+public class KakaoHttpClient implements SocialPlatformPort {
 
     private final RestTemplate restTemplate;
 
@@ -29,10 +30,15 @@ public class KakaoHttpClient implements KakaoTokenPort, KakaoUserPort {
     private String kakaoRedirectUri;
 
     @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
-    private String TOKEN_URL_KAKAO;
+    private String kakaoTokenUri;
 
     @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
-    private String KAKAO_USERINFO_API_URL;
+    private String kakaoUserinfoApiUri;
+
+    @Override
+    public boolean supports(String provider) {
+        return StringUtils.equalsIgnoreCase(SocialPlatform.KAKAO.name(), provider);
+    }
 
     @Override
     public String getAccessTokenByCode(String code) {
@@ -50,7 +56,7 @@ public class KakaoHttpClient implements KakaoTokenPort, KakaoUserPort {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
         ResponseEntity<Map> response = restTemplate.exchange(
-            TOKEN_URL_KAKAO,
+            kakaoTokenUri,
             HttpMethod.POST,
             request,
             Map.class);
@@ -59,14 +65,14 @@ public class KakaoHttpClient implements KakaoTokenPort, KakaoUserPort {
     }
 
     @Override
-    public UserPortResponse findUserFromKakao(String accessToken) {
+    public UserPortResponse findUserByAccessToken(String accessToken) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);  // 액세스 토큰을 Authorization Header에 추가
 
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         ResponseEntity<Map> response = restTemplate.exchange(
-            KAKAO_USERINFO_API_URL,
+            kakaoUserinfoApiUri,
             HttpMethod.GET,
             httpEntity,
             Map.class

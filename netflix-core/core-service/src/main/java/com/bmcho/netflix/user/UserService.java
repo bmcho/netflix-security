@@ -1,11 +1,11 @@
 package com.bmcho.netflix.user;
 
-import com.bmcho.netfilx.kakao.KakaoTokenPort;
-import com.bmcho.netfilx.kakao.KakaoUserPort;
+import com.bmcho.netfilx.social.SocialPlatformPort;
 import com.bmcho.netfilx.user.CreateUser;
 import com.bmcho.netfilx.user.FetchUserPort;
 import com.bmcho.netfilx.user.InsertUserPort;
 import com.bmcho.netfilx.user.UserPortResponse;
+import com.bmcho.netflix.exception.NetflixException;
 import com.bmcho.netflix.exception.UserException;
 import com.bmcho.netflix.user.command.UserRegistrationCommand;
 import com.bmcho.netflix.user.command.UserResponse;
@@ -13,6 +13,7 @@ import com.bmcho.netflix.user.response.UserRegistrationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,7 +22,7 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
 
     private final InsertUserPort insertUserPort;
     private final FetchUserPort fetchUserPort;
-    private final KakaoUserPort kakaoUserPort;
+    private final List<SocialPlatformPort> socialPlatformPorts;
 
     @Override
     public UserResponse findByEmail(String email) {
@@ -54,12 +55,16 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
     }
 
     @Override
-    public UserResponse findKakaoUser(String accessToken) {
-        UserPortResponse userFromKakao = kakaoUserPort.findUserFromKakao(accessToken);
+    public UserResponse findUserAccessToken(String provider, String accessToken) {
+        SocialPlatformPort selectedPort = socialPlatformPorts.stream()
+            .filter(port -> port.supports(provider))
+            .findFirst()
+            .orElseThrow(NetflixException.NetflixUnsupportedSocialLoginException::new);
+        UserPortResponse user = selectedPort.findUserByAccessToken(accessToken);
         return UserResponse.builder()
-            .username(userFromKakao.username())
-            .provider(userFromKakao.provider())
-            .providerId(userFromKakao.providerId())
+            .username(user.username())
+            .provider(user.provider())
+            .providerId(user.providerId())
             .build();
     }
 
