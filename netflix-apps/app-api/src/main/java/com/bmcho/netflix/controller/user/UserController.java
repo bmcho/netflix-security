@@ -4,8 +4,12 @@ import com.bmcho.netflix.controller.NetflixApiResponse;
 import com.bmcho.netflix.controller.user.reqeust.UserLoginRequest;
 import com.bmcho.netflix.controller.user.reqeust.UserRegistrationRequest;
 import com.bmcho.netflix.security.NetflixAuthUser;
+import com.bmcho.netflix.token.FetchTokenUseCase;
+import com.bmcho.netflix.token.UpdateTokenUseCase;
+import com.bmcho.netflix.user.FetchUserUseCase;
 import com.bmcho.netflix.user.RegisterUserUseCase;
 import com.bmcho.netflix.user.command.UserRegistrationCommand;
+import com.bmcho.netflix.user.command.UserResponse;
 import com.bmcho.netflix.user.response.UserRegistrationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,9 +28,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final RegisterUserUseCase registerUserUseCase;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final AuthenticationManager authenticationManager;
+
+    private final RegisterUserUseCase registerUserUseCase;
+    private final FetchTokenUseCase fetchTokenUseCase;
+    private final FetchUserUseCase fetchUserUseCase;
+    private final UpdateTokenUseCase updateTokenUseCase;
 
     @PostMapping("/user/register")
     public NetflixApiResponse<UserRegistrationResponse> userRegister(@RequestBody UserRegistrationRequest userRegistrationRequest) {
@@ -65,7 +72,6 @@ public class UserController {
          *     Builder 통해 userDetailService 를 등록하면 DaoAuthenticationConfigurer 통해 등록된 userDetailService 가지고 있는 DaoAuthenticationProvider 를 생성
          */
 
-//        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(token);
         Authentication authentication = authenticationManager.authenticate(token);
         NetflixAuthUser netflixAuthUser = (NetflixAuthUser) authentication.getPrincipal();
 
@@ -75,7 +81,28 @@ public class UserController {
     @PostMapping("/user/callback")
     public NetflixApiResponse<String> kakaoLoginCallback(@RequestBody Map<String, String> request) {
         String code = request.get("code");
-        return NetflixApiResponse.ok(code);
+
+        // 받은 코드를 KaKao 인증서버에 전송 및 유효성 검사 이후 토큰 리턴
+        String accessTokenFromKakao = fetchTokenUseCase.getTokenFromKakao(code);
+        // 사용자 정보 요청
+        UserResponse kakaoUser = fetchUserUseCase.findKakaoUser(accessTokenFromKakao);
+        // 소셜 유저 확인 및 저장
+        UserResponse userByProviderId = fetchUserUseCase.findByProviderId(kakaoUser.providerId());
+        if (userByProviderId == null) {
+            // 저장
+            registerUserUseCase.registerSocialUser(
+                kakaoUser.username(),
+                kakaoUser.provider(),
+                kakaoUser.providerId()
+            );
+        }
+
+        /* TODO: 2025-07-1, 화, 11:57 bmcho12
+         *  추후 비대칭키 변경
+        */
+        //서버내 secret key 로 server token 생성
+        String accessToken = updateTokenUseCase.updateInsertToken(kakaoUser.providerId());
+        return NetflixApiResponse.ok(accessToken);
     }
 
 }

@@ -84,6 +84,24 @@ public class TokenService implements FetchTokenUseCase, UpdateTokenUseCase, Crea
         return fetchUserUseCase.findByProviderId(userId.toString());
     }
 
+    @Override
+    public String updateInsertToken(String providerId) {
+        TokenPortResponse tokenByUserId = searchTokenPort.findByUserId(providerId);
+        String accessToken = getToken(providerId, Duration.ofHours(accessTokenExpireHour));
+        String refreshToken = getToken(providerId, Duration.ofHours(refreshTokenExpireHour));
+
+        // create
+        if (tokenByUserId == null) {
+            insertTokenPort.create(providerId, accessToken, refreshToken);
+        }
+        // update
+        else {
+            updateTokenPort.updateToken(providerId, accessToken, refreshToken);
+        }
+
+        return accessToken;
+    }
+
     private String getToken(String userId, Duration expireAt) {
         Date now = new Date();
         Instant instant = now.toInstant();
@@ -114,4 +132,5 @@ public class TokenService implements FetchTokenUseCase, UpdateTokenUseCase, Crea
             return e.getClaims();
         }
     }
+
 }
