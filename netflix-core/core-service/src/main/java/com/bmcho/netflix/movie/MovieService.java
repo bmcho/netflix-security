@@ -5,13 +5,16 @@ import com.bmcho.netfilx.movie.TmdbPageableMovies;
 import com.bmcho.netflix.movie.response.MovieResponse;
 import com.bmcho.netflix.movie.response.PageableMoviesResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class MovieService implements FetchMovieUseCase {
+public class MovieService implements FetchMovieUseCase, InsertMovieUseCase {
 
     private final TmdbMoviePort tmdbMoviePort;
 
@@ -30,5 +33,10 @@ public class MovieService implements FetchMovieUseCase {
                 tmdbPageableMovies.page(),
                 tmdbPageableMovies.hasNext()
         );
+    }
+
+    @Override
+    public void insert(List<MovieResponse> movies) {
+        log.info("Movie Size : {} -> {}", movies.size(), movies.get(0).movieName());
     }
 }
