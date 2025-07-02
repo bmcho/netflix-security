@@ -13,5 +13,9 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.security:spring-security-oauth2-client")
+}
 
+val appMainClassName = "com.bmcho.netflix.NetflixApiApplication"
+tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    mainClass.set(appMainClassName)
 }
