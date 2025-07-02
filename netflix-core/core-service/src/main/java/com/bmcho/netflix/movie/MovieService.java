@@ -1,5 +1,6 @@
 package com.bmcho.netflix.movie;
 
+import com.bmcho.netfilx.movie.PersistenceMoviePort;
 import com.bmcho.netfilx.movie.TmdbMoviePort;
 import com.bmcho.netfilx.movie.TmdbPageableMovies;
 import com.bmcho.netflix.movie.response.MovieResponse;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class MovieService implements FetchMovieUseCase, InsertMovieUseCase {
 
     private final TmdbMoviePort tmdbMoviePort;
+    private final PersistenceMoviePort persistenceMoviePort;
 
     @Override
     public PageableMoviesResponse fetchFromClient(int page) {
@@ -37,6 +39,16 @@ public class MovieService implements FetchMovieUseCase, InsertMovieUseCase {
 
     @Override
     public void insert(List<MovieResponse> movies) {
-        log.info("Movie Size : {} -> {}", movies.size(), movies.get(0).movieName());
+        movies.forEach(movie -> {
+            NetflixMovie netflixMovie = NetflixMovie.builder()
+                .movieName(movie.movieName())
+                .isAdult(movie.isAdult())
+                .overview(movie.overview())
+                .releasedAt(movie.releaseAt())
+                .genre(String.join(",", movie.genre()))
+                .build();
+
+            persistenceMoviePort.insert(netflixMovie);
+        });
     }
 }
