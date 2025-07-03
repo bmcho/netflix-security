@@ -6,6 +6,7 @@ import com.bmcho.netfilx.token.InsertTokenPort;
 import com.bmcho.netfilx.token.SearchTokenPort;
 import com.bmcho.netfilx.token.TokenPortResponse;
 import com.bmcho.netfilx.token.UpdateTokenPort;
+import com.bmcho.netflix.dispatcher.SocialPlatformDispatcher;
 import com.bmcho.netflix.exception.NetflixException;
 import com.bmcho.netflix.token.CreateTokenUseCase;
 import com.bmcho.netflix.token.FetchTokenUseCase;
@@ -42,11 +43,13 @@ public class TokenService implements FetchTokenUseCase, UpdateTokenUseCase, Crea
     @Value("${jwt.expire.refresh-token}")
     private int refreshTokenExpireHour;
 
+
+
     private final SearchTokenPort searchTokenPort;
     private final InsertTokenPort insertTokenPort;
     private final UpdateTokenPort updateTokenPort;
     private final FetchUserUseCase fetchUserUseCase;
-    private final List<SocialPlatformPort> socialPlatformPorts;
+    private final SocialPlatformDispatcher socialPlatformDispatcher;
 
     @Override
     public TokenResponse createNewToken(String userId) {
@@ -71,11 +74,8 @@ public class TokenService implements FetchTokenUseCase, UpdateTokenUseCase, Crea
 
     @Override
     public String getTokenByCode(String provider, String code) {
-        SocialPlatformPort selectedPort = socialPlatformPorts.stream()
-            .filter(port -> port.supports(provider))
-            .findFirst()
-            .orElseThrow(NetflixException.NetflixUnsupportedSocialLoginException::new);
-        return selectedPort.getAccessTokenByCode(code);
+        SocialPlatformPort socialPlatformPort = socialPlatformDispatcher.getProvide(provider);
+        return socialPlatformPort.getAccessTokenByCode(code);
     }
 
     @Override

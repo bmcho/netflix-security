@@ -55,7 +55,6 @@ public class UserController {
         String email = userLoginRequest.getEmail();
         String password = userLoginRequest.getPassword();
 
-
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
 
         /**
@@ -75,31 +74,27 @@ public class UserController {
 
         Authentication authentication = authenticationManager.authenticate(token);
         NetflixAuthUser netflixAuthUser = (NetflixAuthUser) authentication.getPrincipal();
+        String accessToken = updateTokenUseCase.updateInsertToken(netflixAuthUser.getUserId());
 
-        return NetflixApiResponse.ok("access-token");
+        return NetflixApiResponse.ok(accessToken);
     }
 
-
-    /* TODO: 2025-07-1, 화, 15:25 bmcho12
-     *  kakao 밖에 못받음, adpater 쪽에서  소셜 로그인에 대한 provider 생성으로 관리 필요
-    */
     // front-end 에서 리다이렉트를 받고 처리 하는 과정
     @PostMapping("/user/callback")
-    public NetflixApiResponse<String> kakaoLoginCallback(@RequestBody Map<String, String> request) {
-        String code = request.get("code");
+    public NetflixApiResponse<String> kakaoLoginCallback(@RequestParam String code, @RequestParam String provider) {
 
         // 받은 코드를 KaKao 인증서버에 전송 및 유효성 검사 이후 토큰 리턴
-        String accessTokenFromKakao = fetchTokenUseCase.getTokenByCode(SocialPlatform.KAKAO.name(), code);
+        String socialAccessToken = fetchTokenUseCase.getTokenByCode(provider, code);
         // 사용자 정보 요청
-        UserResponse kakaoUser = fetchUserUseCase.findUserAccessToken(SocialPlatform.KAKAO.name(), accessTokenFromKakao);
+        UserResponse user = fetchUserUseCase.findUserAccessToken(provider, socialAccessToken);
         // 소셜 유저 확인 및 저장
-        UserResponse userByProviderId = fetchUserUseCase.findByProviderId(kakaoUser.providerId());
+        UserResponse userByProviderId = fetchUserUseCase.findByProviderId(user.providerId());
         if (userByProviderId == null) {
             // 저장
             registerUserUseCase.registerSocialUser(
-                kakaoUser.username(),
-                kakaoUser.provider(),
-                kakaoUser.providerId()
+                user.username(),
+                user.provider(),
+                user.providerId()
             );
         }
 
@@ -107,7 +102,7 @@ public class UserController {
          *  추후 비대칭키 변경
          */
         //서버내 secret key 로 server token 생성
-        String accessToken = updateTokenUseCase.updateInsertToken(kakaoUser.providerId());
+        String accessToken = updateTokenUseCase.updateInsertToken(user.providerId());
         return NetflixApiResponse.ok(accessToken);
     }
 

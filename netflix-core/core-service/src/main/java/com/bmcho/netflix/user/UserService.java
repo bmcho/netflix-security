@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -23,9 +24,56 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
     private final FetchUserPort fetchUserPort;
     private final SocialPlatformDispatcher socialPlatformDispatcher;
 
+    /*
+        이렇게 유저서칭에 대한걸 만들어 줄수 있으나 굳이..
+     */
+//    @Override
+//    public UserResponse findUserByUserId(String userId) {
+//        return findUserBy(userId, fetchUserPort::findByUserId);
+//    }
+//
+//    @Override
+//    public UserResponse findUserByEmail(String email) {
+//        return findUserBy(email, fetchUserPort::findByEmail);
+//    }
+//
+//    private UserResponse findUserBy(String searchParam, Function<String, Optional<UserPortResponse>> searchFunction) {
+//        return searchFunction.apply(searchParam)
+//            .map(this::mapToUserResponse)
+//            .orElseThrow(UserException.UserDoesNotExistException::new);
+//    }
+//
+//    private UserResponse mapToUserResponse(UserPortResponse userPortResponse) {
+//        return UserResponse.builder()
+//            .userId(userPortResponse.getUserId())
+//            .email(userPortResponse.getEmail())
+//            .password(userPortResponse.getPassword())
+//            .phone(userPortResponse.getPhone())
+//            .role(userPortResponse.getRole())
+//            .username(userPortResponse.getUsername())
+//            .build();
+//    }
+
+    @Override
+    public UserResponse findUserByUserId(String userId) {
+        Optional<UserPortResponse> userByEmail = fetchUserPort.findByUserId(userId);
+        if (userByEmail.isEmpty()) {
+            throw new UserException.UserDoesNotExistException();
+        }
+
+        UserPortResponse userPortResponse = userByEmail.get();
+        return UserResponse.builder()
+            .userId(userPortResponse.userId())
+            .email(userPortResponse.email())
+            .password(userPortResponse.password())
+            .phone(userPortResponse.phone())
+            .role(userPortResponse.role())
+            .username(userPortResponse.username())
+            .build();
+    }
+
     @Override
     public UserResponse findByEmail(String email) {
-
         Optional<UserPortResponse> userByEmail = fetchUserPort.findByEmail(email);
         if (userByEmail.isEmpty()) {
             throw new UserException.UserDoesNotExistException();
@@ -45,7 +93,7 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
     @Override
     public UserResponse findByProviderId(String providerId) {
         return fetchUserPort.findByProviderId(providerId)
-            .map(user ->  UserResponse.builder()
+            .map(user -> UserResponse.builder()
                 .providerId(user.providerId())
                 .provider(user.provider())
                 .username(user.username())

@@ -49,6 +49,19 @@ public class UserRepository implements InsertUserPort, FetchUserPort {
     }
 
     @Override
+    public Optional<UserPortResponse> findByUserId(String userId) {
+        Optional<UserEntity> userByUserId = userJpaRepository.findByUserId(userId);
+
+        return userByUserId.map(userEntity -> UserPortResponse.builder()
+            .userId(userEntity.getUserId())
+            .password(userEntity.getPassword())
+            .username(userEntity.getUsername())
+            .email(userEntity.getEmail())
+            .phone(userEntity.getPhone())
+            .build());
+    }
+
+    @Override
     @Transactional
     public UserPortResponse create(CreateUser createUser) {
         UserEntity userEntity = new UserEntity(
