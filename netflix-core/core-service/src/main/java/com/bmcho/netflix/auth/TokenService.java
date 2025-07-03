@@ -79,7 +79,7 @@ public class TokenService implements FetchTokenUseCase, UpdateTokenUseCase, Crea
     }
 
     @Override
-    public UserResponse fineUserByAccessToken(String accessToken) {
+    public UserResponse findUserByAccessToken(String accessToken) {
         Claims claims = parseClaims(accessToken);
         Object userId = claims.get("userId");
 

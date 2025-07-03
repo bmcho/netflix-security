@@ -7,5 +7,5 @@ public interface FetchTokenUseCase {
 
     String getTokenByCode(String provider, String code);
 
-    UserResponse fineUserByAccessToken(String accessToken);
+    UserResponse findUserByAccessToken(String accessToken);
 }

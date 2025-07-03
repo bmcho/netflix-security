@@ -1,23 +1,27 @@
 package com.bmcho.netflix.controller.movie;
 
+import com.bmcho.netflix.controller.NetflixApiResponse;
 import com.bmcho.netflix.movie.FetchMovieUseCase;
 import com.bmcho.netflix.movie.response.PageableMoviesResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/movie")
+@RequestMapping("/api/v1")
 public class MovieController {
 
     private final FetchMovieUseCase fetchMovieUseCase;
 
-    @GetMapping("/client/{page}")
-    public String fetchMoviePageable(@PathVariable("page") int page) {
+    @GetMapping("/movie/client/{page}")
+    public NetflixApiResponse<PageableMoviesResponse> fetchMoviePageable(@PathVariable int page) {
         PageableMoviesResponse pageableMoviesResponse = fetchMovieUseCase.fetchFromClient(page);
-        return "success";
+        return NetflixApiResponse.ok(pageableMoviesResponse);
+    }
+
+    @GetMapping("/movie/search")
+    public NetflixApiResponse<PageableMoviesResponse> searchMovies(@RequestParam int page) {
+        PageableMoviesResponse pageableMoviesResponse = fetchMovieUseCase.fetchFromDb(page);
+        return NetflixApiResponse.ok(pageableMoviesResponse);
     }
 }
