@@ -29,4 +29,13 @@ public class UserMovieLike {
                 .likeYn(true)
                 .build();
     }
+
+    public static UserMovieLike newUnLike(String userId, String movieId) {
+        return UserMovieLike.builder()
+            .userMovieLikeId(UUID.randomUUID().toString())
+            .userId(userId)
+            .movieId(movieId)
+            .likeYn(false)
+            .build();
+    }
 }

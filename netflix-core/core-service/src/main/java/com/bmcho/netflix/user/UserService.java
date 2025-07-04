@@ -1,12 +1,10 @@
 package com.bmcho.netflix.user;
 
 import com.bmcho.netfilx.social.SocialPlatformPort;
-import com.bmcho.netfilx.user.CreateUser;
-import com.bmcho.netfilx.user.FetchUserPort;
-import com.bmcho.netfilx.user.InsertUserPort;
-import com.bmcho.netfilx.user.UserPortResponse;
+import com.bmcho.netfilx.user.*;
 import com.bmcho.netflix.dispatcher.SocialPlatformDispatcher;
 import com.bmcho.netflix.exception.UserException;
+import com.bmcho.netflix.user.command.UserHistoryCommand;
 import com.bmcho.netflix.user.command.UserRegistrationCommand;
 import com.bmcho.netflix.user.command.UserResponse;
 import com.bmcho.netflix.user.response.UserRegistrationResponse;
@@ -18,10 +16,11 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements RegisterUserUseCase, FetchUserUseCase {
+public class UserService implements RegisterUserUseCase, FetchUserUseCase, UserHistoryUseCase {
 
     private final InsertUserPort insertUserPort;
     private final FetchUserPort fetchUserPort;
+    private final UserHistoryPort userHistoryPort;
     private final SocialPlatformDispatcher socialPlatformDispatcher;
 
     /*
@@ -151,4 +150,20 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
         UserPortResponse socialUser = insertUserPort.createSocialUser(username, provider, providerId);
         return new UserRegistrationResponse(socialUser.username(), null, null);
     }
+
+    @Override
+    public void createHistory(UserHistoryCommand userHistoryCommand) {
+        userHistoryPort.createHistory(
+            CreateUserHistory.builder()
+                .userId(userHistoryCommand.userId())
+                .userRole(userHistoryCommand.userRole())
+                .clientIp(userHistoryCommand.clientIp())
+                .reqMethod(userHistoryCommand.reqMethod())
+                .reqUrl(userHistoryCommand.reqUrl())
+                .reqHeader(userHistoryCommand.reqHeader())
+                .reqPayload(userHistoryCommand.reqPayload())
+                .build()
+        );
+    }
+
 }

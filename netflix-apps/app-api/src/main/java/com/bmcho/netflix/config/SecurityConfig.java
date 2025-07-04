@@ -1,6 +1,7 @@
 package com.bmcho.netflix.config;
 
 import com.bmcho.netflix.config.filter.JwtAuthenticationFilter;
+import com.bmcho.netflix.config.filter.UserHistoryLoggingFilter;
 import com.bmcho.netflix.security.NetflixUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,7 @@ import java.util.Collections;
 public class SecurityConfig {
     private final NetflixUserDetailsService netflixUserDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final UserHistoryLoggingFilter userHistoryLoggingFilter;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -52,6 +54,7 @@ public class SecurityConfig {
                 .defaultSuccessUrl("/api/v1/user/social-login/success")
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(userHistoryLoggingFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
     }
 
