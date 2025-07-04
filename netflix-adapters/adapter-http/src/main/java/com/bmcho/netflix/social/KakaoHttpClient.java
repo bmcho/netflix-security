@@ -2,7 +2,7 @@ package com.bmcho.netflix.social;
 
 import com.bmcho.netfilx.social.SocialPlatformPort;
 import com.bmcho.netfilx.user.UserPortResponse;
-import com.bmcho.netflix.enums.SocialPlatform;
+import com.bmcho.netflix.enums.SocialPlatformType;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +37,7 @@ public class KakaoHttpClient implements SocialPlatformPort {
 
     @Override
     public boolean supports(String provider) {
-        return StringUtils.equalsIgnoreCase(SocialPlatform.KAKAO.name(), provider);
+        return StringUtils.equalsIgnoreCase(SocialPlatformType.KAKAO.name(), provider);
     }
 
     @Override

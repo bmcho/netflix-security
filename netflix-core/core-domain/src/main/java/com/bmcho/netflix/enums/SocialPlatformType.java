@@ -5,8 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 
-@RequiredArgsConstructor
-public enum SocialPlatform {
+public enum SocialPlatformType {
     KAKAO("kakao"),
     NAVER("naver"),
     GOGLE("gogle");
@@ -16,5 +15,8 @@ public enum SocialPlatform {
             .anyMatch(value -> StringUtils.equalsIgnoreCase(value.provider, name));
     }
 
+    SocialPlatformType(String provider) {
+        this.provider = provider;
+    }
     private final String provider;
 }

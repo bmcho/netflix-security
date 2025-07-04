@@ -2,7 +2,7 @@ package com.bmcho.netflix.social;
 
 import com.bmcho.netfilx.social.SocialPlatformPort;
 import com.bmcho.netfilx.user.UserPortResponse;
-import com.bmcho.netflix.enums.SocialPlatform;
+import com.bmcho.netflix.enums.SocialPlatformType;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +37,7 @@ public class NaverHttpClient implements SocialPlatformPort {
 
     @Override
     public boolean supports(String provider) {
-        return StringUtils.equalsIgnoreCase(SocialPlatform.NAVER.name(), provider);
+        return StringUtils.equalsIgnoreCase(SocialPlatformType.NAVER.name(), provider);
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.bmcho.netflix.controller.user;
 import com.bmcho.netflix.controller.NetflixApiResponse;
 import com.bmcho.netflix.controller.user.reqeust.UserLoginRequest;
 import com.bmcho.netflix.controller.user.reqeust.UserRegistrationRequest;
-import com.bmcho.netflix.enums.SocialPlatform;
 import com.bmcho.netflix.security.NetflixAuthUser;
 import com.bmcho.netflix.token.FetchTokenUseCase;
 import com.bmcho.netflix.token.UpdateTokenUseCase;
@@ -20,7 +19,6 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
