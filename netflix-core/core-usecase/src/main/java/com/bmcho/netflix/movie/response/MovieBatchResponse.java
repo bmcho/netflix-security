@@ -2,8 +2,7 @@ package com.bmcho.netflix.movie.response;
 
 import java.util.List;
 
-public record MovieResponse(
-    String movieId,
+public record MovieBatchResponse(
     String movieName,
     boolean isAdult,
     List<String> genre,

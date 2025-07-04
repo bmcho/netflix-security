@@ -10,7 +10,9 @@ public enum ErrorCode {
     NETFLIX_UNSUPPORTED_SOCIAL_LOGIN("NFX1001", "지원하지 않는 소셜 로그인"),
     USER_ALREADY_EXIST("NFX2000", "사용자가 이미 존재합니다."),
     USER_DOES_NOT_EXIST("NFX2001", "사용자가 존재하지 않습니다."),
-    AUTHENTICATION_FAILED("NFX2002", "인증에 실패했습니다. 이메일 또는 비밀번호를 확인해주세요.")
+    AUTHENTICATION_FAILED("NFX2002", "인증에 실패했습니다. 이메일 또는 비밀번호를 확인해주세요."),
+    NO_MORE_MOVIE_DOWNLOAD("NFX2003", "더 이상 영화를 다운로드 할 수 없습니다."),
+    ACCESS_DENIED("NFX2004", "해당 기능에 접근이 제한됩니다.")
     ;
 
     private final String code;

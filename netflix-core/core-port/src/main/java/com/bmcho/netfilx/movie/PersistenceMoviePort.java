@@ -7,7 +7,9 @@ import java.util.List;
 public interface PersistenceMoviePort {
     List<NetflixMovie> fetchByPageAndSize(int page, int size);
 
-    NetflixMovie findById(String movieName);
+    NetflixMovie findByMovieName(String movieName);
+
+    NetflixMovie findByMovieId(String movieName);
 
     void insert(NetflixMovie netflixMovie);
 }
