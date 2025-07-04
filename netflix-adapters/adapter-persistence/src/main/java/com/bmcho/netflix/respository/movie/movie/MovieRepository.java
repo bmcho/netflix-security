@@ -1,4 +1,4 @@
-package com.bmcho.netflix.respository.movie;
+package com.bmcho.netflix.respository.movie.movie;
 
 import com.bmcho.netfilx.movie.PersistenceMoviePort;
 import com.bmcho.netflix.entity.movie.MovieEntity;

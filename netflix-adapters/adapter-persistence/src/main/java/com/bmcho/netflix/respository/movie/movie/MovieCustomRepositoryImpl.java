@@ -1,4 +1,4 @@
-package com.bmcho.netflix.respository.movie;
+package com.bmcho.netflix.respository.movie.movie;
 
 
 import com.bmcho.netflix.entity.movie.MovieEntity;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import static com.bmcho.netflix.entity.movie.QMovieEntity.movieEntity;
+
 @Repository
 @RequiredArgsConstructor
 public class MovieCustomRepositoryImpl implements MovieCustomRepository{
@@ -21,8 +23,8 @@ public class MovieCustomRepositoryImpl implements MovieCustomRepository{
 
     @Override
     public Optional<MovieEntity> findByMovieName(String name) {
-        return jpaQueryFactory.selectFrom(QMovieEntity.movieEntity)
-            .where(QMovieEntity.movieEntity.movieName.eq(name))
+        return jpaQueryFactory.selectFrom(movieEntity)
+            .where(movieEntity.movieName.eq(name))
             .fetch()
             .stream()
             .findFirst();
@@ -30,12 +32,12 @@ public class MovieCustomRepositoryImpl implements MovieCustomRepository{
 
     @Override
     public Page<MovieEntity> search(Pageable pageable) {
-        List<MovieEntity> fetch = jpaQueryFactory.selectFrom(QMovieEntity.movieEntity)
+        List<MovieEntity> fetch = jpaQueryFactory.selectFrom(movieEntity)
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
 
-        long count = jpaQueryFactory.selectFrom(QMovieEntity.movieEntity)
+        long count = jpaQueryFactory.selectFrom(movieEntity)
             .fetch()
             .size();
 
