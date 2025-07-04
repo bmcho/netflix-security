@@ -97,6 +97,7 @@ public class UserService implements RegisterUserUseCase, FetchUserUseCase {
                 .providerId(user.providerId())
                 .provider(user.provider())
                 .username(user.username())
+                .role(user.role())
                 .build())
             .orElse(null);
     }

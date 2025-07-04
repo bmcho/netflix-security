@@ -11,9 +11,9 @@ public enum SubscriptionType {
     GOLD("gold")  // 영화 조회 + 다운로드 무제한 + 좋아요/싫어요
     ;
 
-    SubscriptionType(String type) {
-        this.type = type;
+    SubscriptionType(String role) {
+        this.role = role;
     }
 
-    private final String type;
+    private final String role;
 }

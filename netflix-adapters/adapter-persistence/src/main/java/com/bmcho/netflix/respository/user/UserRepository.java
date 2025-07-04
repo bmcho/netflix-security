@@ -6,6 +6,9 @@ import com.bmcho.netfilx.user.InsertUserPort;
 import com.bmcho.netfilx.user.UserPortResponse;
 import com.bmcho.netflix.entity.user.SocialUserEntity;
 import com.bmcho.netflix.entity.user.UserEntity;
+import com.bmcho.netflix.enums.SubscriptionType;
+import com.bmcho.netflix.respository.subscription.UserSubscriptionRepository;
+import com.bmcho.netflix.subscription.UserSubscription;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -18,10 +21,12 @@ public class UserRepository implements InsertUserPort, FetchUserPort {
 
     private final UserJpaRepository userJpaRepository;
     private final SocialUserJpaRepository socialUserJpaRepository;
+    private final UserSubscriptionRepository userSubscriptionRepository;
 
     @Override
     public Optional<UserPortResponse> findByEmail(String email) {
         Optional<UserEntity> userByEmail = userJpaRepository.findByEmail(email);
+
         return userByEmail.map(userEntity -> UserPortResponse.builder()
             .userId(userEntity.getUserId())
             .password(userEntity.getPassword())
@@ -41,10 +46,17 @@ public class UserRepository implements InsertUserPort, FetchUserPort {
         }
 
         SocialUserEntity socialUserEntity = userByProviderId.get();
+        Optional<UserSubscription> userBySocialUserId = userSubscriptionRepository.findByUserId(socialUserEntity.getSocialUserId());
+
+        String role = userBySocialUserId
+            .map(subscription -> subscription.getSubscriptionType().getRole())
+            .orElse(SubscriptionType.FREE.getRole());
+
         return Optional.of(UserPortResponse.builder()
             .username(socialUserEntity.getUsername())
             .provider(socialUserEntity.getProvider())
             .providerId(socialUserEntity.getProviderId())
+            .role(role)
             .build());
     }
 
@@ -72,6 +84,8 @@ public class UserRepository implements InsertUserPort, FetchUserPort {
         );
 
         UserEntity savedUserEntity = userJpaRepository.save(userEntity);
+        userSubscriptionRepository.create(savedUserEntity.getUserId());
+
         return UserPortResponse.builder()
             .userId(savedUserEntity.getUserId())
             .username(savedUserEntity.getUsername())
@@ -86,6 +100,8 @@ public class UserRepository implements InsertUserPort, FetchUserPort {
     public UserPortResponse createSocialUser(String username, String provider, String providerId) {
         SocialUserEntity socialUserEntity = new SocialUserEntity(username, provider, providerId);
         socialUserJpaRepository.save(socialUserEntity);
+        userSubscriptionRepository.create(socialUserEntity.getSocialUserId());
+
         return UserPortResponse.builder()
             .username(socialUserEntity.getUsername())
             .provider(socialUserEntity.getProvider())
