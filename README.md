@@ -39,7 +39,6 @@ netflix-security
 |   |-- core-port/ # 외부와의 통신을 위한 인터페이스를 모아둔 모듈
 |   |-- core-service/ # 비즈니스 로직을 구현하는 모듈
 |   |-- core-usecase/ # 클라이언트에서 호출할 수 있는 인터페이스를 모아둔 모듈
-|-- netplix-frontend/ # react.js 기반 프론트엔드 모듈
 ```
 
 ---
