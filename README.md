@@ -18,8 +18,6 @@
 - MySQL
 - Flyway
 - Docker
-- React 18
-- Node 20.9.0
 
 ---
 
