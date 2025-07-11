@@ -115,7 +115,7 @@ public class UserController {
 
         String id = attributes.get("id").toString();
         String username = Optional.ofNullable(attributes.get("nickname")).map(Object::toString).orElse("unknown");
-        String provider = Optional.ofNullable(attributes.get("nickname")).map(Object::toString).orElse("unknown");
+        String provider = Optional.ofNullable(attributes.get("provider")).map(Object::toString).orElse("unknown");
 
         UserResponse userByProviderId = fetchUserUseCase.findByProviderId(id);
         if (userByProviderId == null) {

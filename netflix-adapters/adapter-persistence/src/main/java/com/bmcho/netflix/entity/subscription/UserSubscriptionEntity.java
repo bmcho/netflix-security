@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Getter
 @Entity
-@Table(name = "user_subscriptons")
+@Table(name = "user_subscriptions")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class UserSubscriptionEntity extends MutableBaseEntity {
@@ -30,10 +30,10 @@ public class UserSubscriptionEntity extends MutableBaseEntity {
     @Enumerated(value = EnumType.STRING)
     private SubscriptionType subscriptionName;
 
-    @Column(name ="SUBSCRIPTION_START_AT")
+    @Column(name ="START_AT")
     private LocalDateTime subscriptionStartAt;
 
-    @Column(name ="SUBSCRIPTION_END_AT")
+    @Column(name ="END_AT")
     private LocalDateTime subscriptionEndAt;
 
     @Column(name = "VALID_YN")
