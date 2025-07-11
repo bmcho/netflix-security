@@ -18,8 +18,6 @@
 - MySQL
 - Flyway
 - Docker
-- React 18
-- Node 20.9.0
 
 ---
 
@@ -39,7 +37,6 @@ netflix-security
 |   |-- core-port/ # 외부와의 통신을 위한 인터페이스를 모아둔 모듈
 |   |-- core-service/ # 비즈니스 로직을 구현하는 모듈
 |   |-- core-usecase/ # 클라이언트에서 호출할 수 있는 인터페이스를 모아둔 모듈
-|-- netplix-frontend/ # react.js 기반 프론트엔드 모듈
 ```
 
 ---
@@ -50,7 +47,6 @@ netflix-security
 - **netplix-apps**: 클라이언트가 호출할 수 있는 REST API 와 배치잡을 모아둔 모듈
 - **netplix-adapters**: HTTP Client, DB, Redis 등 외부 인프라와 통신하기 위한 모듈
 - **netplix-commons**: 공통으로 사용되는 유틸리티를 모아둔 모듈
-- **netplix-frontend**: React 기반의 프론트엔드 코드를 모아둔 모듈
 
 ---
 
